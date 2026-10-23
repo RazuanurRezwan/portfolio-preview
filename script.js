@@ -48,3 +48,33 @@ if(welcomeAudio&&welcomeToggle&&welcomeWidget){
   box.addEventListener('click',e=>{if(e.target===box)close();});
   document.addEventListener('keydown',e=>{if(!box.classList.contains('open'))return;if(e.key==='Escape')close();else if(e.key==='ArrowLeft')open(index-1);else if(e.key==='ArrowRight')open(index+1);});
 })();
+
+
+// RR cinematic motion system: content stays visible even if the observer is unavailable.
+(function initRRCinematicMotion(){
+  // The portfolio owner explicitly requested the full cinematic animation treatment.
+  // Content remains visible by default even if JavaScript/IntersectionObserver is unavailable.
+  document.documentElement.classList.add('rr-motion-ready');
+  const targets = document.querySelectorAll(
+    '#about .section-label, #about .stats > div, #experience .timeline article, ' +
+    '#work .section-label, #work .section-head, #work .work-card, #skills .section-label, ' +
+    '#skills .skill-grid > div, #test-prep .section-label, #test-prep .test-grid > div, ' +
+    '#credentials .section-label, #credentials .credential, .education .section-label, ' +
+    '.education h2, #contact .section-label, #contact .contact-box > div'
+  );
+  if (!targets.length) return;
+  targets.forEach(el => el.classList.add('scroll-motion'));
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('motion-enter');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.14, rootMargin: '0px 0px -4% 0px' });
+    targets.forEach(el => observer.observe(el));
+  } else {
+    targets.forEach(el => el.classList.add('motion-enter'));
+  }
+})();
